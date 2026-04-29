@@ -38,29 +38,6 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<String> logout(@RequestHeader(value = "Authorization", required = false) String authHeader) {
-        // Check if Authorization header is present
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Authorization header is missing or invalid. Please provide a valid Bearer token.");
-        }
-
-        String token = authHeader.substring(7);
-
-        // Check if token is a valid JWT
-        if (!jwtUtil.validateToken(token)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("Invalid or expired token. Logout failed.");
-        }
-
-        // Check if token is already blacklisted
-        if (tokenBlacklistService.isBlacklisted(token)) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body("Token is already logged out.");
-        }
-
-        // Blacklist the token
-        tokenBlacklistService.addToken(token);
-        return ResponseEntity.ok("Logged out successfully.");
+        return authService.logout(authHeader);
     }
 }
-
