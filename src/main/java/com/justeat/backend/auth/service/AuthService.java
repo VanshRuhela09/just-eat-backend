@@ -39,6 +39,23 @@ public class AuthService {
         return new AuthResponse(token);
     }
 
+    public AuthResponse registerOwner(RegisterRequest request) {
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("User already exists");
+        }
+
+        User user = User.builder()
+                .name(request.getName())
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .role(Role.OWNER)
+                .build();
+
+        userRepository.save(user);
+        String token = jwtUtil.generateToken(user.getEmail());
+        return new AuthResponse(token);
+    }
+
     public AuthResponse login(LoginRequest request) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
