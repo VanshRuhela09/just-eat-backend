@@ -34,6 +34,13 @@ public class RestaurantController {
         return ResponseEntity.ok(restaurantService.updateRestaurant(id, request));
     }
 
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('OWNER')")
+    public ResponseEntity<String> deleteRestaurant(@PathVariable Long id) {
+        restaurantService.deleteRestaurant(id);
+        return ResponseEntity.ok("Restaurant deleted successfully.");
+    }
+
 
     @GetMapping
     public ResponseEntity<List<RestaurantResponse>> getAllRestaurants() {

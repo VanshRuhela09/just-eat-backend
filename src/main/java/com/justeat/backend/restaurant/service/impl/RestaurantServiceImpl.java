@@ -90,6 +90,21 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
 
     @Override
+    public void deleteRestaurant(Long id) {
+        User owner = getAuthenticatedUser();
+
+        Restaurant restaurant = restaurantRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Restaurant not found with id: " + id));
+
+        // Ensure the logged-in user is the owner of this restaurant
+        if (!restaurant.getOwner().getId().equals(owner.getId())) {
+            throw new AccessDeniedException("You are not authorized to delete this restaurant.");
+        }
+
+        restaurantRepository.delete(restaurant);
+    }
+
+    @Override
     public List<RestaurantResponse> getAllRestaurants() {
         return restaurantRepository.findAll()
                 .stream()
