@@ -1,4 +1,4 @@
-package com.justeat.user.entity;
+package com.justeat.backend.user.entity;
 
 import com.justeat.backend.common.entity.BaseEntity;
 import com.justeat.backend.common.enums.Role;

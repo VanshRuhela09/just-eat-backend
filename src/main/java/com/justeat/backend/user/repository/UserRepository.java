@@ -1,6 +1,6 @@
 package com.justeat.backend.user.repository;
 
-import com.justeat.user.entity.User;
+import com.justeat.backend.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
