@@ -5,6 +5,8 @@ import com.justeat.backend.restaurant.entity.Restaurant;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "menu_items")
 @Getter
@@ -33,6 +35,16 @@ public class MenuItem extends BaseEntity {
     @Column(nullable = false)
     @Builder.Default
     private Boolean isSpecial = false;
+
+    @Column(nullable = false, columnDefinition = "integer default 0")
+    @Builder.Default
+    private Integer orderCount = 0;
+
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    @Builder.Default
+    private Boolean isPopular = false;
+
+    private LocalDateTime lastPopularityUpdate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "restaurant_id", nullable = false)

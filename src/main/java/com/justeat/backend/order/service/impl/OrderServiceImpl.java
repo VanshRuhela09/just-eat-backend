@@ -3,6 +3,7 @@ package com.justeat.backend.order.service.impl;
 import com.justeat.backend.cart.entity.Cart;
 import com.justeat.backend.cart.entity.CartItem;
 import com.justeat.backend.cart.repository.CartRepository;
+import com.justeat.backend.menu.service.PopularityService;
 import com.justeat.backend.order.dto.OrderItemResponse;
 import com.justeat.backend.order.dto.OrderResponse;
 import com.justeat.backend.order.entity.Order;
@@ -36,6 +37,7 @@ public class OrderServiceImpl implements OrderService {
     private final CartRepository cartRepository;
     private final UserRepository userRepository;
     private final RestaurantRepository restaurantRepository;
+    private final PopularityService popularityService;
 
     /**
      * Get the currently authenticated user from SecurityContextHolder.
@@ -147,6 +149,14 @@ public class OrderServiceImpl implements OrderService {
 
         // Save order
         Order savedOrder = orderRepository.save(order);
+
+        // Increment order count for each menu item (for popularity tracking)
+        for (OrderItem orderItem : savedOrder.getItems()) {
+            popularityService.incrementOrderCount(
+                    orderItem.getMenuItem().getId(),
+                    orderItem.getQuantity()
+            );
+        }
 
         // Clear cart
         cart.getItems().clear();
