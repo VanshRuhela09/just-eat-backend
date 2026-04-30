@@ -8,7 +8,6 @@ import com.justeat.backend.config.security.JwtUtil;
 import com.justeat.backend.config.security.TokenBlacklistService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
