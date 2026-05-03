@@ -15,7 +15,7 @@ public class JwtUtil {
     @Value("${jwt.secret:justeat_super_secret_key_which_is_at_least_32_chars_long!}")
     private String secret;
 
-    @Value("${jwt.expiration:3600000}")
+    @Value("${jwt.expiration:604800000}")
     private long expirationMs;
 
     private SecretKey getSigningKey() {
