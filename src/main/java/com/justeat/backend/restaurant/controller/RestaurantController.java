@@ -56,6 +56,9 @@ public class RestaurantController {
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String location,
             @RequestParam(required = false) String cuisine) {
+        System.out.println("name=" + name + " | " + (name != null ? name.getClass() : "null"));
+        System.out.println("location=" + location + " | " + (location != null ? location.getClass() : "null"));
+        System.out.println("cuisine=" + cuisine + " | " + (cuisine != null ? cuisine.getClass() : "null"));
         return ResponseEntity.ok(restaurantService.searchRestaurants(name, location, cuisine));
     }
 
