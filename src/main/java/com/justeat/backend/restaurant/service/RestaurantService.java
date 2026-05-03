@@ -11,5 +11,6 @@ public interface RestaurantService {
     void deleteRestaurant(Long id);
     List<RestaurantResponse> getAllRestaurants();
     List<RestaurantResponse> searchRestaurants(String name, String location, String cuisine);
+    void updateRating(Long restaurantId, String username, Double rating);
 }
 

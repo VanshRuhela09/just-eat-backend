@@ -3,6 +3,7 @@ package com.justeat.backend.order.controller;
 import com.justeat.backend.order.dto.OrderResponse;
 import com.justeat.backend.order.dto.UpdateOrderStatusRequest;
 import com.justeat.backend.order.service.OrderService;
+import com.justeat.backend.restaurant.dto.RatingRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -75,6 +76,19 @@ public class OrderController {
             @PathVariable Long id,
             @Valid @RequestBody UpdateOrderStatusRequest request) {
         return ResponseEntity.ok(orderService.updateOrderStatus(id, request.getStatus()));
+    }
+
+    /**
+     * PATCH /orders/{id}/rate
+     * Rate a completed order.
+     * Only accessible by CUSTOMER role.
+     */
+    @PatchMapping("/{id}/rate")
+    @PreAuthorize("hasRole('CUSTOMER')")
+    public ResponseEntity<OrderResponse> rateOrder(
+            @PathVariable Long id,
+            @RequestBody RatingRequest ratingRequest) {
+        return ResponseEntity.ok(orderService.rateOrder(id, ratingRequest.getRating()));
     }
 }
 

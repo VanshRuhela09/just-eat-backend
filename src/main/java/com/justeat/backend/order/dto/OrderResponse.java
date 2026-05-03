@@ -18,9 +18,11 @@ public class OrderResponse {
     private String customerName;
     private String customerEmail;
     private String restaurantName;
+    private Long restaurantId;
     private List<OrderItemResponse> items;
     private Double totalAmount;
     private OrderStatus status;
     private LocalDateTime createdAt;
+    private Double rating;
 }
 

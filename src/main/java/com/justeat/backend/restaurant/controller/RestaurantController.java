@@ -9,6 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import com.justeat.backend.restaurant.dto.RatingRequest;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.List;
 
@@ -55,5 +58,17 @@ public class RestaurantController {
             @RequestParam(required = false) String cuisine) {
         return ResponseEntity.ok(restaurantService.searchRestaurants(name, location, cuisine));
     }
+
+    @PreAuthorize("hasRole('CUSTOMER')")
+    @PatchMapping("/{restaurantId}/rating")
+    public ResponseEntity<?> updateRating(
+            @Valid
+            @PathVariable Long restaurantId,
+            @RequestBody RatingRequest ratingRequest,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        restaurantService.updateRating(restaurantId, userDetails.getUsername(), ratingRequest.getRating());
+        return ResponseEntity.ok("Rating updated.");
+    }
+
 }
 

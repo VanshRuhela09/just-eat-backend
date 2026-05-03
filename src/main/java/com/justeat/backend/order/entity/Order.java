@@ -47,5 +47,8 @@ public class Order extends BaseEntity {
     @Column(nullable = false)
     @Builder.Default
     private LocalDateTime orderCreatedAt = LocalDateTime.now();
+
+    @Column(nullable = true)
+    private Double rating;
 }
 

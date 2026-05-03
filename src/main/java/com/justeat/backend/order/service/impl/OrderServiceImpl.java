@@ -12,6 +12,8 @@ import com.justeat.backend.order.enums.OrderStatus;
 import com.justeat.backend.order.repository.OrderRepository;
 import com.justeat.backend.order.service.OrderService;
 import com.justeat.backend.restaurant.entity.Restaurant;
+import com.justeat.backend.restaurant.entity.RestaurantRating;
+import com.justeat.backend.restaurant.repository.RestaurantRatingRepository;
 import com.justeat.backend.restaurant.repository.RestaurantRepository;
 import com.justeat.backend.user.entity.User;
 import com.justeat.backend.user.repository.UserRepository;
@@ -37,6 +39,7 @@ public class OrderServiceImpl implements OrderService {
     private final CartRepository cartRepository;
     private final UserRepository userRepository;
     private final RestaurantRepository restaurantRepository;
+    private final RestaurantRatingRepository restaurantRatingRepository;
     private final PopularityService popularityService;
 
     /**
@@ -68,10 +71,12 @@ public class OrderServiceImpl implements OrderService {
                 .customerName(order.getUser().getName())
                 .customerEmail(order.getUser().getEmail())
                 .restaurantName(order.getRestaurant().getName())
+                .restaurantId(order.getRestaurant().getId())
                 .items(itemResponses)
                 .totalAmount(order.getTotalAmount())
                 .status(order.getStatus())
                 .createdAt(order.getOrderCreatedAt())
+                .rating(order.getRating())
                 .build();
     }
 
@@ -232,6 +237,47 @@ public class OrderServiceImpl implements OrderService {
         Order updatedOrder = orderRepository.save(order);
 
         return mapToResponse(updatedOrder);
+    }
+
+    @Override
+    public OrderResponse rateOrder(Long orderId, Double rating) {
+        User user = getAuthenticatedUser();
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found with id: " + orderId));
+
+        // Only the customer who placed the order can rate it
+        if (!order.getUser().getId().equals(user.getId())) {
+            throw new AccessDeniedException("You are not authorized to rate this order.");
+        }
+
+        // Only completed orders can be rated
+        if (order.getStatus() != OrderStatus.COMPLETED) {
+            throw new IllegalStateException("You can only rate a completed order.");
+        }
+
+        // Validate rating value (1 to 5)
+        if (rating < 1 || rating > 5) {
+            throw new IllegalArgumentException("Rating must be between 1 and 5.");
+        }
+
+        // Save rating on the order
+        order.setRating(rating);
+        orderRepository.save(order);
+
+        // Save or update the RestaurantRating for this user-restaurant pair
+        Restaurant restaurant = order.getRestaurant();
+        RestaurantRating rr = restaurantRatingRepository.findByRestaurantAndUser(restaurant, user)
+                .orElse(RestaurantRating.builder().restaurant(restaurant).user(user).build());
+        rr.setRating(rating);
+        restaurantRatingRepository.save(rr);
+
+        // Recalculate and update the restaurant's average rating
+        Double avg = restaurantRatingRepository.findAverageByRestaurant(restaurant);
+        restaurant.setRating(avg);
+        restaurantRepository.save(restaurant);
+
+        return mapToResponse(order);
     }
 }
 

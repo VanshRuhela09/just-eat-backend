@@ -14,6 +14,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.justeat.backend.restaurant.entity.RestaurantRating;
+import com.justeat.backend.restaurant.repository.RestaurantRatingRepository;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,7 +26,7 @@ public class RestaurantServiceImpl implements RestaurantService {
 
     private final RestaurantRepository restaurantRepository;
     private final UserRepository userRepository;
-
+    private final RestaurantRatingRepository restaurantRatingRepository;
 
     private User getAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -119,5 +122,26 @@ public class RestaurantServiceImpl implements RestaurantService {
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
+
+
+    @Override
+    public void updateRating(Long restaurantId, String username, Double rating) {
+        Restaurant restaurant = restaurantRepository.findById(restaurantId)
+                .orElseThrow(() -> new RuntimeException("Restaurant not found"));
+        User user = userRepository.findByEmail(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Save or update user's rating
+        RestaurantRating rr = restaurantRatingRepository.findByRestaurantAndUser(restaurant, user)
+                .orElse(RestaurantRating.builder().restaurant(restaurant).user(user).build());
+        rr.setRating(rating);
+        restaurantRatingRepository.save(rr);
+
+        // Recalculate average
+        Double avg = restaurantRatingRepository.findAverageByRestaurant(restaurant);
+        restaurant.setRating(avg);
+        restaurantRepository.save(restaurant);
+    }
+
 }
 
