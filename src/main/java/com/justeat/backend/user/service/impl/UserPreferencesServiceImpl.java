@@ -126,8 +126,7 @@ public class UserPreferencesServiceImpl implements UserPreferencesService {
         User user = getAuthenticatedUser();
         UserPreferences prefs = getOrCreatePreferences(user);
 
-        // Validate and set favourite restaurant IDs
-        if (request.getFavouriteRestaurantIds() != null && !request.getFavouriteRestaurantIds().isEmpty()) {
+        if (request.getFavouriteRestaurantIds() != null) {
             Set<Long> validIds = request.getFavouriteRestaurantIds().stream()
                     .filter(restaurantRepository::existsById)
                     .collect(Collectors.toSet());
@@ -141,8 +140,7 @@ public class UserPreferencesServiceImpl implements UserPreferencesService {
             prefs.setFavouriteRestaurantIds(request.getFavouriteRestaurantIds());
         }
 
-        // Validate and set favourite cuisines
-        if (request.getFavouriteCuisines() != null && !request.getFavouriteCuisines().isEmpty()) {
+        if (request.getFavouriteCuisines() != null) {
             Set<String> normalizedCuisines = request.getFavouriteCuisines().stream()
                     .map(this::validateAndNormalizeCuisine)
                     .collect(Collectors.toSet());
@@ -150,7 +148,7 @@ public class UserPreferencesServiceImpl implements UserPreferencesService {
         }
 
         // Validate and set dietary restrictions
-        if (request.getDietaryRestrictions() != null && !request.getDietaryRestrictions().isEmpty()) {
+        if (request.getDietaryRestrictions() != null) {
             Set<String> normalizedRestrictions = request.getDietaryRestrictions().stream()
                     .map(this::validateAndNormalizeRestriction)
                     .collect(Collectors.toSet());
