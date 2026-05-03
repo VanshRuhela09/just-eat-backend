@@ -59,16 +59,5 @@ public class RestaurantController {
         return ResponseEntity.ok(restaurantService.searchRestaurants(name, location, cuisine));
     }
 
-    @PreAuthorize("hasRole('CUSTOMER')")
-    @PatchMapping("/{restaurantId}/rating")
-    public ResponseEntity<?> updateRating(
-            @Valid
-            @PathVariable Long restaurantId,
-            @RequestBody RatingRequest ratingRequest,
-            @AuthenticationPrincipal UserDetails userDetails) {
-        restaurantService.updateRating(restaurantId, userDetails.getUsername(), ratingRequest.getRating());
-        return ResponseEntity.ok("Rating updated.");
-    }
-
 }
 
