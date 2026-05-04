@@ -2,9 +2,12 @@ package com.justeat.backend.restaurant.service.impl;
 
 import com.justeat.backend.restaurant.dto.RestaurantRequest;
 import com.justeat.backend.restaurant.dto.RestaurantResponse;
+import com.justeat.backend.restaurant.dto.RestaurantStatusRequest;
 import com.justeat.backend.restaurant.entity.Restaurant;
+import com.justeat.backend.restaurant.enums.RestaurantStatus;
 import com.justeat.backend.restaurant.repository.RestaurantRepository;
 import com.justeat.backend.restaurant.service.RestaurantService;
+import com.justeat.backend.common.enums.Role;
 import com.justeat.backend.user.entity.User;
 import com.justeat.backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -43,6 +46,7 @@ public class RestaurantServiceImpl implements RestaurantService {
                 .cuisine(restaurant.getCuisine())
                 .location(restaurant.getLocation())
                 .rating(restaurant.getRating())
+                .status(restaurant.getStatus())
                 .ownerName(restaurant.getOwner().getName())
                 .ownerEmail(restaurant.getOwner().getEmail())
                 .build();
@@ -89,6 +93,34 @@ public class RestaurantServiceImpl implements RestaurantService {
             restaurant.setCuisine(request.getCuisine());
         }
 
+        return mapToResponse(restaurantRepository.save(restaurant));
+    }
+
+    @Override
+    public RestaurantResponse updateStatus(Long id, RestaurantStatusRequest request) {
+        User currentUser = getAuthenticatedUser();
+
+        Restaurant restaurant = restaurantRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Restaurant not found with id: " + id));
+
+        boolean isAdmin = currentUser.getRole() == Role.ADMIN;
+        boolean isOwner = restaurant.getOwner().getId().equals(currentUser.getId());
+
+        if (!isAdmin && !isOwner) {
+            throw new AccessDeniedException("You are not authorized to update the status of this restaurant.");
+        }
+
+        RestaurantStatus newStatus = request.getStatus();
+
+        // OWNER can only toggle between ACTIVE and INACTIVE
+        if (!isAdmin) {
+            if (newStatus == RestaurantStatus.SUSPENDED || newStatus == RestaurantStatus.CLOSED) {
+                throw new AccessDeniedException(
+                        "Only an ADMIN can set status to " + newStatus + ".");
+            }
+        }
+
+        restaurant.setStatus(newStatus);
         return mapToResponse(restaurantRepository.save(restaurant));
     }
 

@@ -2,6 +2,7 @@ package com.justeat.backend.restaurant.controller;
 
 import com.justeat.backend.restaurant.dto.RestaurantRequest;
 import com.justeat.backend.restaurant.dto.RestaurantResponse;
+import com.justeat.backend.restaurant.dto.RestaurantStatusRequest;
 import com.justeat.backend.restaurant.service.RestaurantService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,21 @@ public class RestaurantController {
             @PathVariable Long id,
             @Valid @RequestBody RestaurantRequest request) {
         return ResponseEntity.ok(restaurantService.updateRestaurant(id, request));
+    }
+
+    /**
+     * PATCH /restaurants/{id}/status
+     * Partially updates only the restaurant status field.
+     *
+     * - OWNER: may set ACTIVE or INACTIVE for their own restaurant.
+     * - ADMIN: may set any status (ACTIVE, INACTIVE, SUSPENDED, CLOSED) for any restaurant.
+     */
+    @PatchMapping("/{id}/status")
+    @PreAuthorize("hasRole('OWNER') or hasRole('ADMIN')")
+    public ResponseEntity<RestaurantResponse> updateRestaurantStatus(
+            @PathVariable Long id,
+            @Valid @RequestBody RestaurantStatusRequest request) {
+        return ResponseEntity.ok(restaurantService.updateStatus(id, request));
     }
 
     @DeleteMapping("/{id}")

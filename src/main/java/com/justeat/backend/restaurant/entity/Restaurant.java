@@ -1,6 +1,7 @@
 package com.justeat.backend.restaurant.entity;
 
 import com.justeat.backend.common.entity.BaseEntity;
+import com.justeat.backend.restaurant.enums.RestaurantStatus;
 import com.justeat.backend.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -32,6 +33,11 @@ public class Restaurant extends BaseEntity {
     @Column(nullable = false)
     @Builder.Default
     private Double rating = 0.0;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    @Builder.Default
+    private RestaurantStatus status = RestaurantStatus.ACTIVE;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id", nullable = false)

@@ -1,5 +1,6 @@
 package com.justeat.backend.restaurant.dto;
 
+import com.justeat.backend.restaurant.enums.RestaurantStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,6 +17,7 @@ public class RestaurantResponse {
     private String cuisine;
     private String location;
     private Double rating;
+    private RestaurantStatus status;
     private String ownerName;
     private String ownerEmail;
 }
