@@ -1,5 +1,6 @@
 package com.justeat.backend.menu.controller;
 
+import com.justeat.backend.menu.dto.MenuItemAvailabilityRequest;
 import com.justeat.backend.menu.dto.MenuItemRequest;
 import com.justeat.backend.menu.dto.MenuItemResponse;
 import com.justeat.backend.menu.service.MenuService;
@@ -33,6 +34,19 @@ public class MenuController {
             @PathVariable Long id,
             @Valid @RequestBody MenuItemRequest request) {
         return ResponseEntity.ok(menuService.updateMenuItem(id, request));
+    }
+
+    /**
+     * PATCH /menu/{id}/availability
+     * Partially updates only the isAvailable flag of a menu item.
+     * Only the OWNER of the restaurant this item belongs to can call this.
+     */
+    @PatchMapping("/{id}/availability")
+    @PreAuthorize("hasRole('OWNER')")
+    public ResponseEntity<MenuItemResponse> updateAvailability(
+            @PathVariable Long id,
+            @Valid @RequestBody MenuItemAvailabilityRequest request) {
+        return ResponseEntity.ok(menuService.updateAvailability(id, request));
     }
 
 

@@ -1,5 +1,6 @@
 package com.justeat.backend.menu.service.impl;
 
+import com.justeat.backend.menu.dto.MenuItemAvailabilityRequest;
 import com.justeat.backend.menu.dto.MenuItemRequest;
 import com.justeat.backend.menu.dto.MenuItemResponse;
 import com.justeat.backend.menu.entity.MenuItem;
@@ -102,6 +103,19 @@ public class MenuServiceImpl implements MenuService {
         if (request.getIsSpecial() != null) {
             menuItem.setIsSpecial(request.getIsSpecial());
         }
+
+        return mapToResponse(menuItemRepository.save(menuItem));
+    }
+
+    @Override
+    public MenuItemResponse updateAvailability(Long id, MenuItemAvailabilityRequest request) {
+        MenuItem menuItem = menuItemRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Menu item not found with id: " + id));
+
+        // Only the owner of the restaurant this item belongs to can toggle availability
+        getRestaurantAndValidateOwnership(menuItem.getRestaurant().getId());
+
+        menuItem.setIsAvailable(request.getIsAvailable());
 
         return mapToResponse(menuItemRepository.save(menuItem));
     }
