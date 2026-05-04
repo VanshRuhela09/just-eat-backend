@@ -52,6 +52,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/restaurants/*/popular-items").permitAll()
                         .requestMatchers(HttpMethod.GET, "/restaurants").permitAll()
                         .requestMatchers(HttpMethod.GET, "/restaurants/search").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/menu/popular").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .authenticationProvider(authenticationProvider())

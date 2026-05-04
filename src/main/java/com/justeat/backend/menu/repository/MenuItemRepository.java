@@ -16,6 +16,8 @@ public interface MenuItemRepository extends JpaRepository<MenuItem, Long> {
 
     List<MenuItem> findByIsPopularTrue();
 
+    List<MenuItem> findByIsPopularTrueOrderByOrderCountDesc();
+
     List<MenuItem> findByRestaurantIdAndIsPopularTrue(Long restaurantId);
 
     List<MenuItem> findByRestaurantIdOrderByOrderCountDesc(Long restaurantId);

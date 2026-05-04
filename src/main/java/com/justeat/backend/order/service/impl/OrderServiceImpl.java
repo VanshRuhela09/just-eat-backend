@@ -155,11 +155,12 @@ public class OrderServiceImpl implements OrderService {
         // Save order
         Order savedOrder = orderRepository.save(order);
 
-        // Increment order count for each menu item (for popularity tracking)
+        // Real-time popularity update: increment order count per item, then recalculate restaurant popularity
         for (OrderItem orderItem : savedOrder.getItems()) {
-            popularityService.incrementOrderCount(
+            popularityService.incrementOrderCountAndRecalculate(
                     orderItem.getMenuItem().getId(),
-                    orderItem.getQuantity()
+                    orderItem.getQuantity(),
+                    restaurantId
             );
         }
 

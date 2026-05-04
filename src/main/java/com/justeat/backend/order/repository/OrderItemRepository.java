@@ -16,6 +16,17 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
            "GROUP BY oi.menuItem.id")
     List<Object[]> getOrderCountsByMenuItem(@Param("since") LocalDateTime since);
 
+    /**
+     * Global popularity query — ignores restaurantId, aggregates across all restaurants.
+     * Returns [menuItemId, totalQuantity] sorted by totalQuantity DESC.
+     */
+    @Query("SELECT oi.menuItem.id, SUM(oi.quantity) as totalOrders " +
+           "FROM OrderItem oi " +
+           "WHERE oi.order.orderCreatedAt >= :since " +
+           "GROUP BY oi.menuItem.id " +
+           "ORDER BY totalOrders DESC")
+    List<Object[]> getOrderCountsByMenuItemAcrossAllRestaurants(@Param("since") LocalDateTime since);
+
     @Query("SELECT oi.menuItem.id, SUM(oi.quantity) as totalOrders " +
            "FROM OrderItem oi " +
            "WHERE oi.menuItem.restaurant.id = :restaurantId AND oi.order.orderCreatedAt >= :since " +
