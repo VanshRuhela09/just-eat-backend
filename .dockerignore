@@ -1,0 +1,26 @@
+# Ignore Maven build output
+/target
+
+# Ignore logs
+/logs
+
+# Ignore IDE/project files
+/.idea
+/.vscode
+*.iml
+*.ipr
+*.iws
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
+
+# Ignore test output
+/test-classes
+
+# Ignore environment files
+.env
+
+# Ignore other unnecessary files
+HELP.md
+
