@@ -24,5 +24,6 @@ public class OrderResponse {
     private OrderStatus status;
     private LocalDateTime createdAt;
     private Double rating;
+    private String addressLine;
 }
 

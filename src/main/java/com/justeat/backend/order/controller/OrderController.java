@@ -1,5 +1,6 @@
 package com.justeat.backend.order.controller;
 
+import com.justeat.backend.order.dto.OrderRequest;
 import com.justeat.backend.order.dto.OrderResponse;
 import com.justeat.backend.order.dto.UpdateOrderStatusRequest;
 import com.justeat.backend.order.service.OrderService;
@@ -27,8 +28,8 @@ public class OrderController {
      */
     @PostMapping("/place")
     @PreAuthorize("hasRole('CUSTOMER')")
-    public ResponseEntity<OrderResponse> placeOrder() {
-        return ResponseEntity.status(HttpStatus.CREATED).body(orderService.placeOrder());
+    public ResponseEntity<OrderResponse> placeOrder(@Valid @RequestBody OrderRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(orderService.placeOrder(request));
     }
 
     /**

@@ -4,6 +4,7 @@ import com.justeat.backend.cart.entity.Cart;
 import com.justeat.backend.cart.entity.CartItem;
 import com.justeat.backend.cart.repository.CartRepository;
 import com.justeat.backend.menu.service.PopularityService;
+import com.justeat.backend.order.dto.OrderRequest;
 import com.justeat.backend.order.dto.OrderItemResponse;
 import com.justeat.backend.order.dto.OrderResponse;
 import com.justeat.backend.order.entity.Order;
@@ -77,6 +78,7 @@ public class OrderServiceImpl implements OrderService {
                 .status(order.getStatus())
                 .createdAt(order.getOrderCreatedAt())
                 .rating(order.getRating())
+                .addressLine(order.getAddressLine())
                 .build();
     }
 
@@ -99,7 +101,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderResponse placeOrder() {
+    public OrderResponse placeOrder(OrderRequest request) {
         User user = getAuthenticatedUser();
 
         // Fetch user's cart
@@ -138,6 +140,7 @@ public class OrderServiceImpl implements OrderService {
                 .totalAmount(totalAmount)
                 .status(OrderStatus.PENDING)
                 .orderCreatedAt(LocalDateTime.now())
+                .addressLine(request.getAddressLine())
                 .build();
 
         // Convert each CartItem → OrderItem
