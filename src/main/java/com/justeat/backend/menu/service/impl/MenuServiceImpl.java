@@ -11,6 +11,8 @@ import com.justeat.backend.restaurant.repository.RestaurantRepository;
 import com.justeat.backend.user.entity.User;
 import com.justeat.backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,6 +25,8 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class MenuServiceImpl implements MenuService {
+
+    private static final Logger log = LoggerFactory.getLogger(MenuServiceImpl.class);
 
     private final MenuItemRepository menuItemRepository;
     private final RestaurantRepository restaurantRepository;
@@ -66,8 +70,8 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     public MenuItemResponse addMenuItem(MenuItemRequest request) {
-        // Validate ownership before adding
         Restaurant restaurant = getRestaurantAndValidateOwnership(request.getRestaurantId());
+        log.info("Adding menu item '{}' to restaurant id: {}", request.getName(), request.getRestaurantId());
 
         MenuItem menuItem = MenuItem.builder()
                 .name(request.getName())
@@ -79,16 +83,20 @@ public class MenuServiceImpl implements MenuService {
                 .restaurant(restaurant)
                 .build();
 
-        return mapToResponse(menuItemRepository.save(menuItem));
+        MenuItemResponse response = mapToResponse(menuItemRepository.save(menuItem));
+        log.info("Menu item created with id: {}", response.getId());
+        return response;
     }
 
     @Override
     public MenuItemResponse updateMenuItem(Long id, MenuItemRequest request) {
+        log.info("Updating menu item id: {}", id);
         MenuItem menuItem = menuItemRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Menu item not found with id: " + id));
 
-        // Validate ownership of the restaurant this item belongs to
         getRestaurantAndValidateOwnership(menuItem.getRestaurant().getId());
+
+        // ...existing code...
 
         if (request.getName() != null && !request.getName().isBlank()) {
             menuItem.setName(request.getName());
@@ -127,13 +135,14 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     public void deleteMenuItem(Long id) {
+        log.info("Deleting menu item id: {}", id);
         MenuItem menuItem = menuItemRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Menu item not found with id: " + id));
 
-        // Validate ownership of the restaurant this item belongs to
         getRestaurantAndValidateOwnership(menuItem.getRestaurant().getId());
 
         menuItemRepository.delete(menuItem);
+        log.info("Menu item id: {} deleted successfully", id);
     }
 
     @Override

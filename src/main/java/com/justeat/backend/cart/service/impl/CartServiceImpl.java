@@ -13,6 +13,8 @@ import com.justeat.backend.menu.repository.MenuItemRepository;
 import com.justeat.backend.user.entity.User;
 import com.justeat.backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -27,6 +29,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional
 public class CartServiceImpl implements CartService {
+
+    private static final Logger log = LoggerFactory.getLogger(CartServiceImpl.class);
 
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
@@ -91,6 +95,7 @@ public class CartServiceImpl implements CartService {
     public CartResponse addItem(CartItemRequest request) {
         User user = getAuthenticatedUser();
         Cart cart = getOrCreateCart(user);
+        log.info("Adding menu item id: {} to cart for user: {}", request.getMenuItemId(), user.getEmail());
 
         // Fetch and validate menu item
         MenuItem menuItem = menuItemRepository.findById(request.getMenuItemId())
@@ -126,6 +131,7 @@ public class CartServiceImpl implements CartService {
     public CartResponse updateItemQuantity(Long cartItemId, CartItemRequest request) {
         User user = getAuthenticatedUser();
         Cart cart = getOrCreateCart(user);
+        log.info("Updating cart item id: {} quantity to {} for user: {}", cartItemId, request.getQuantity(), user.getEmail());
 
         CartItem cartItem = cartItemRepository.findById(cartItemId)
                 .orElseThrow(() -> new RuntimeException("Cart item not found with id: " + cartItemId));
@@ -151,6 +157,7 @@ public class CartServiceImpl implements CartService {
     public CartResponse removeItem(Long cartItemId) {
         User user = getAuthenticatedUser();
         Cart cart = getOrCreateCart(user);
+        log.info("Removing cart item id: {} for user: {}", cartItemId, user.getEmail());
 
         CartItem cartItem = cartItemRepository.findById(cartItemId)
                 .orElseThrow(() -> new RuntimeException("Cart item not found with id: " + cartItemId));
@@ -169,6 +176,7 @@ public class CartServiceImpl implements CartService {
     @Override
     public void clearCart() {
         User user = getAuthenticatedUser();
+        log.info("Clearing cart for user: {}", user.getEmail());
         Cart cart = getOrCreateCart(user);
         cart.getItems().clear();
         cartRepository.save(cart);

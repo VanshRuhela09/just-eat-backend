@@ -11,6 +11,8 @@ import com.justeat.backend.common.enums.Role;
 import com.justeat.backend.user.entity.User;
 import com.justeat.backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,6 +28,8 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class RestaurantServiceImpl implements RestaurantService {
+
+    private static final Logger log = LoggerFactory.getLogger(RestaurantServiceImpl.class);
 
     private final RestaurantRepository restaurantRepository;
     private final UserRepository userRepository;
@@ -56,6 +60,7 @@ public class RestaurantServiceImpl implements RestaurantService {
     @Override
     public RestaurantResponse createRestaurant(RestaurantRequest request) {
         User owner = getAuthenticatedUser();
+        log.info("Creating restaurant '{}' for owner: {}", request.getName(), owner.getEmail());
 
         Restaurant restaurant = Restaurant.builder()
                 .name(request.getName())
@@ -67,18 +72,21 @@ public class RestaurantServiceImpl implements RestaurantService {
                 .owner(owner)
                 .build();
 
-        return mapToResponse(restaurantRepository.save(restaurant));
+        RestaurantResponse response = mapToResponse(restaurantRepository.save(restaurant));
+        log.info("Restaurant created with id: {}", response.getId());
+        return response;
     }
 
     @Override
     public RestaurantResponse updateRestaurant(Long id, RestaurantRequest request) {
         User owner = getAuthenticatedUser();
+        log.info("Updating restaurant id: {} by owner: {}", id, owner.getEmail());
 
         Restaurant restaurant = restaurantRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Restaurant not found with id: " + id));
 
-        // Ensure the logged-in user is the owner of this restaurant
         if (!restaurant.getOwner().getId().equals(owner.getId())) {
+            log.warn("Unauthorized update attempt on restaurant id: {} by user: {}", id, owner.getEmail());
             throw new AccessDeniedException("You are not authorized to update this restaurant.");
         }
 

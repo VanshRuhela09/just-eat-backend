@@ -6,6 +6,8 @@ import com.justeat.backend.user.entity.User;
 import com.justeat.backend.user.repository.UserRepository;
 import com.justeat.backend.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -15,6 +17,8 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
+
+    private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -45,25 +49,25 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse getLoggedInUser() {
         User user = getAuthenticatedUser();
+        log.info("Fetching profile for user: {}", user.getEmail());
         return mapToResponse(user);
     }
 
     @Override
     public UserResponse updateLoggedInUser(UpdateUserRequest request) {
         User user = getAuthenticatedUser();
+        log.info("Updating profile for user: {}", user.getEmail());
 
-        // Update name if provided
         if (request.getName() != null && !request.getName().isBlank()) {
             user.setName(request.getName());
         }
 
-        // Update password if provided (encode it)
         if (request.getPassword() != null && !request.getPassword().isBlank()) {
             user.setPassword(passwordEncoder.encode(request.getPassword()));
         }
 
-        // Email and Role are NOT updatable from this API
         userRepository.save(user);
+        log.debug("Profile updated successfully for user: {}", user.getEmail());
         return mapToResponse(user);
     }
 }

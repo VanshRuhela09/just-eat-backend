@@ -19,6 +19,8 @@ import com.justeat.backend.restaurant.repository.RestaurantRepository;
 import com.justeat.backend.user.entity.User;
 import com.justeat.backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -35,6 +37,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional
 public class OrderServiceImpl implements OrderService {
+
+    private static final Logger log = LoggerFactory.getLogger(OrderServiceImpl.class);
 
     private final OrderRepository orderRepository;
     private final CartRepository cartRepository;
@@ -103,6 +107,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderResponse placeOrder(OrderRequest request) {
         User user = getAuthenticatedUser();
+        log.info("Placing order for user: {}", user.getEmail());
 
         // Fetch user's cart
         Cart cart = cartRepository.findByUserId(user.getId())
@@ -157,6 +162,7 @@ public class OrderServiceImpl implements OrderService {
 
         // Save order
         Order savedOrder = orderRepository.save(order);
+        log.info("Order placed successfully with id: {} for user: {}", savedOrder.getId(), user.getEmail());
 
         // Real-time popularity update: increment order count per item, then recalculate restaurant popularity
         for (OrderItem orderItem : savedOrder.getItems()) {
@@ -239,6 +245,7 @@ public class OrderServiceImpl implements OrderService {
 
         order.setStatus(newStatus);
         Order updatedOrder = orderRepository.save(order);
+        log.info("Order id: {} status updated to: {}", orderId, newStatus);
 
         return mapToResponse(updatedOrder);
     }

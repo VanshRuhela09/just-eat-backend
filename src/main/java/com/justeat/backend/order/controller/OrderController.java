@@ -5,6 +5,9 @@ import com.justeat.backend.order.dto.OrderResponse;
 import com.justeat.backend.order.dto.UpdateOrderStatusRequest;
 import com.justeat.backend.order.service.OrderService;
 import com.justeat.backend.restaurant.dto.RatingRequest;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,6 +20,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/orders")
 @RequiredArgsConstructor
+@Tag(name = "Orders", description = "Order placement, tracking and management")
 public class OrderController {
 
     private final OrderService orderService;
@@ -26,6 +30,7 @@ public class OrderController {
      * Place an order from the cart.
      * Only accessible by CUSTOMER role.
      */
+    @Operation(summary = "Place an order from the cart (CUSTOMER only)")
     @PostMapping("/place")
     @PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<OrderResponse> placeOrder(@Valid @RequestBody OrderRequest request) {
@@ -37,6 +42,7 @@ public class OrderController {
      * Get logged-in user's order history.
      * Only accessible by CUSTOMER role.
      */
+    @Operation(summary = "Get the order history of the logged-in customer")
     @GetMapping("/my")
     @PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<List<OrderResponse>> getMyOrders() {
@@ -48,9 +54,10 @@ public class OrderController {
      * Get order details by ID.
      * Accessible by both CUSTOMER (own orders) and OWNER (their restaurant orders).
      */
+    @Operation(summary = "Get order details by ID (CUSTOMER or OWNER)")
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('CUSTOMER', 'OWNER')")
-    public ResponseEntity<OrderResponse> getOrderById(@PathVariable Long id) {
+    public ResponseEntity<OrderResponse> getOrderById(@Parameter(description = "Order ID") @PathVariable Long id) {
         return ResponseEntity.ok(orderService.getOrderById(id));
     }
 
@@ -59,6 +66,7 @@ public class OrderController {
      * Get all orders for the owner's restaurant(s).
      * Only accessible by OWNER role.
      */
+    @Operation(summary = "Get all orders for the owner's restaurant(s) (OWNER only)")
     @GetMapping("/restaurant")
     @PreAuthorize("hasRole('OWNER')")
     public ResponseEntity<List<OrderResponse>> getRestaurantOrders() {
@@ -71,10 +79,11 @@ public class OrderController {
      * Only accessible by OWNER role.
      * Status flow: PENDING → PREPARING → READY → COMPLETED
      */
+    @Operation(summary = "Update order status — PENDING→PREPARING→READY→COMPLETED (OWNER only)")
     @PutMapping("/{id}/status")
     @PreAuthorize("hasRole('OWNER')")
     public ResponseEntity<OrderResponse> updateOrderStatus(
-            @PathVariable Long id,
+            @Parameter(description = "Order ID") @PathVariable Long id,
             @Valid @RequestBody UpdateOrderStatusRequest request) {
         return ResponseEntity.ok(orderService.updateOrderStatus(id, request.getStatus()));
     }
@@ -84,12 +93,12 @@ public class OrderController {
      * Rate a completed order.
      * Only accessible by CUSTOMER role.
      */
+    @Operation(summary = "Rate a completed order (CUSTOMER only)")
     @PatchMapping("/{id}/rate")
     @PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<OrderResponse> rateOrder(
-            @PathVariable Long id,
+            @Parameter(description = "Order ID") @PathVariable Long id,
             @RequestBody RatingRequest ratingRequest) {
         return ResponseEntity.ok(orderService.rateOrder(id, ratingRequest.getRating()));
     }
 }
-
