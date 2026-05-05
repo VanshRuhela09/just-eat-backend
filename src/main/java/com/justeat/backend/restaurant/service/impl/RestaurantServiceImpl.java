@@ -49,6 +49,7 @@ public class RestaurantServiceImpl implements RestaurantService {
                 .status(restaurant.getStatus())
                 .ownerName(restaurant.getOwner().getName())
                 .ownerEmail(restaurant.getOwner().getEmail())
+                .imageUrl(restaurant.getImageUrl())
                 .build();
     }
 
@@ -62,6 +63,7 @@ public class RestaurantServiceImpl implements RestaurantService {
                 .location(request.getLocation())
                 .cuisine(request.getCuisine())
                 .rating(0.0)
+                .imageUrl(request.getImageUrl())
                 .owner(owner)
                 .build();
 
@@ -91,6 +93,9 @@ public class RestaurantServiceImpl implements RestaurantService {
         }
         if (request.getCuisine() != null && !request.getCuisine().isBlank()) {
             restaurant.setCuisine(request.getCuisine());
+        }
+        if (request.getImageUrl() != null) {
+            restaurant.setImageUrl(request.getImageUrl());
         }
 
         return mapToResponse(restaurantRepository.save(restaurant));

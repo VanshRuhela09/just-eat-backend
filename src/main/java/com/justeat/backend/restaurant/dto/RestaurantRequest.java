@@ -16,5 +16,7 @@ public class RestaurantRequest {
 
     @NotBlank(message = "Cuisine is required")
     private String cuisine;
+
+    private String imageUrl;
 }
 

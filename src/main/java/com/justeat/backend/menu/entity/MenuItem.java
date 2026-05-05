@@ -46,6 +46,8 @@ public class MenuItem extends BaseEntity {
 
     private LocalDateTime lastPopularityUpdate;
 
+    private String imageUrl;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "restaurant_id", nullable = false)
     private Restaurant restaurant;

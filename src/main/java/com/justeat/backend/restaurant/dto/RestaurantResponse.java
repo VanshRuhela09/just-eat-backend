@@ -20,5 +20,6 @@ public class RestaurantResponse {
     private RestaurantStatus status;
     private String ownerName;
     private String ownerEmail;
+    private String imageUrl;
 }
 

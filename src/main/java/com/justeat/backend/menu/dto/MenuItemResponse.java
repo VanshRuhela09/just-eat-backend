@@ -17,5 +17,6 @@ public class MenuItemResponse {
     private Boolean isAvailable;
     private Boolean isSpecial;
     private String restaurantName;
+    private String imageUrl;
 }
 

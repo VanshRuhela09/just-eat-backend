@@ -25,5 +25,7 @@ public class MenuItemRequest {
 
     @NotNull(message = "Restaurant ID is required")
     private Long restaurantId;
+
+    private String imageUrl;
 }
 

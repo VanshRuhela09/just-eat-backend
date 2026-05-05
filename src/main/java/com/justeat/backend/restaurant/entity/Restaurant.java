@@ -39,6 +39,8 @@ public class Restaurant extends BaseEntity {
     @Builder.Default
     private RestaurantStatus status = RestaurantStatus.ACTIVE;
 
+    private String imageUrl;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
