@@ -1,5 +1,3 @@
-# Ignore Maven build output
-/target
 
 # Ignore logs
 /logs

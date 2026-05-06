@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  backend:
+    build: .
+    image: justeat-backend:latest
+    container_name: justeat-backend-app
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/justeatdb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      JWT_SECRET: justeat_super_secret_key_which_is_at_least_32_chars_long!
+      MAIL_USERNAME: justeat996@gmail.com
+      MAIL_PASSWORD: ivkkaipygqwpkzdo
+      FRONTEND_URLS: http://localhost:5173
+      SERVER_PORT: 8081
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+  db:
+    image: postgres:15
+    container_name: justeat-db
+    environment:
+      POSTGRES_DB: justeatdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+networks:
+  app-network:
+
+volumes:
+  postgres-data:
+
