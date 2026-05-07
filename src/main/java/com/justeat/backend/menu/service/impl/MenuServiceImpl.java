@@ -13,6 +13,8 @@ import com.justeat.backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -69,6 +71,7 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
+    @CacheEvict(value = {"menuByRestaurant", "menuSpecials"}, allEntries = true)
     public MenuItemResponse addMenuItem(MenuItemRequest request) {
         Restaurant restaurant = getRestaurantAndValidateOwnership(request.getRestaurantId());
         log.info("Adding menu item '{}' to restaurant id: {}", request.getName(), request.getRestaurantId());
@@ -89,14 +92,13 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
+    @CacheEvict(value = {"menuByRestaurant", "menuSpecials"}, allEntries = true)
     public MenuItemResponse updateMenuItem(Long id, MenuItemRequest request) {
         log.info("Updating menu item id: {}", id);
         MenuItem menuItem = menuItemRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Menu item not found with id: " + id));
 
         getRestaurantAndValidateOwnership(menuItem.getRestaurant().getId());
-
-        // ...existing code...
 
         if (request.getName() != null && !request.getName().isBlank()) {
             menuItem.setName(request.getName());
@@ -121,6 +123,7 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
+    @CacheEvict(value = {"menuByRestaurant", "menuSpecials"}, allEntries = true)
     public MenuItemResponse updateAvailability(Long id, MenuItemAvailabilityRequest request) {
         MenuItem menuItem = menuItemRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Menu item not found with id: " + id));
@@ -134,6 +137,7 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
+    @CacheEvict(value = {"menuByRestaurant", "menuSpecials"}, allEntries = true)
     public void deleteMenuItem(Long id) {
         log.info("Deleting menu item id: {}", id);
         MenuItem menuItem = menuItemRepository.findById(id)
@@ -146,8 +150,8 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
+    @Cacheable(value = "menuByRestaurant", key = "#restaurantId")
     public List<MenuItemResponse> getMenuByRestaurant(Long restaurantId) {
-        // Verify restaurant exists
         if (!restaurantRepository.existsById(restaurantId)) {
             throw new RuntimeException("Restaurant not found with id: " + restaurantId);
         }
@@ -159,6 +163,7 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
+    @Cacheable(value = "menuSpecials")
     public List<MenuItemResponse> getAllSpecials() {
         return menuItemRepository.findByIsSpecialTrue()
                 .stream()

@@ -13,6 +13,8 @@ import com.justeat.backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -58,6 +60,7 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
 
     @Override
+    @CacheEvict(value = {"restaurants", "restaurantSearch"}, allEntries = true)
     public RestaurantResponse createRestaurant(RestaurantRequest request) {
         User owner = getAuthenticatedUser();
         log.info("Creating restaurant '{}' for owner: {}", request.getName(), owner.getEmail());
@@ -78,6 +81,7 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
 
     @Override
+    @CacheEvict(value = {"restaurants", "restaurantSearch"}, allEntries = true)
     public RestaurantResponse updateRestaurant(Long id, RestaurantRequest request) {
         User owner = getAuthenticatedUser();
         log.info("Updating restaurant id: {} by owner: {}", id, owner.getEmail());
@@ -110,6 +114,7 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
 
     @Override
+    @CacheEvict(value = {"restaurants", "restaurantSearch"}, allEntries = true)
     public RestaurantResponse updateStatus(Long id, RestaurantStatusRequest request) {
         User currentUser = getAuthenticatedUser();
 
@@ -138,6 +143,7 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
 
     @Override
+    @CacheEvict(value = {"restaurants", "restaurantSearch"}, allEntries = true)
     public void deleteRestaurant(Long id) {
         User owner = getAuthenticatedUser();
 
@@ -153,6 +159,7 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
 
     @Override
+    @Cacheable(value = "restaurants")
     public List<RestaurantResponse> getAllRestaurants() {
         return restaurantRepository.findAll()
                 .stream()
@@ -161,6 +168,7 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
 
     @Override
+    @Cacheable(value = "restaurantSearch", key = "#name + '_' + #location + '_' + #cuisine")
     public List<RestaurantResponse> searchRestaurants(String name, String location, String cuisine) {
         return restaurantRepository.search(name, location, cuisine)
                 .stream()

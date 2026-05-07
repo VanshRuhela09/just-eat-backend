@@ -1,6 +1,7 @@
 package com.justeat.backend.menu.repository;
 
 import com.justeat.backend.menu.entity.MenuItem;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -10,16 +11,22 @@ import java.util.List;
 
 public interface MenuItemRepository extends JpaRepository<MenuItem, Long> {
 
+    @EntityGraph(attributePaths = {"restaurant"})
     List<MenuItem> findByRestaurantId(Long restaurantId);
 
+    @EntityGraph(attributePaths = {"restaurant"})
     List<MenuItem> findByIsSpecialTrue();
 
+    @EntityGraph(attributePaths = {"restaurant"})
     List<MenuItem> findByIsPopularTrue();
 
+    @EntityGraph(attributePaths = {"restaurant"})
     List<MenuItem> findByIsPopularTrueOrderByOrderCountDesc();
 
+    @EntityGraph(attributePaths = {"restaurant"})
     List<MenuItem> findByRestaurantIdAndIsPopularTrue(Long restaurantId);
 
+    @EntityGraph(attributePaths = {"restaurant"})
     List<MenuItem> findByRestaurantIdOrderByOrderCountDesc(Long restaurantId);
 
     @Modifying
@@ -38,4 +45,3 @@ public interface MenuItemRepository extends JpaRepository<MenuItem, Long> {
     @Query("UPDATE MenuItem m SET m.orderCount = m.orderCount + :quantity WHERE m.id = :menuItemId")
     void incrementOrderCount(@Param("menuItemId") Long menuItemId, @Param("quantity") Integer quantity);
 }
-
