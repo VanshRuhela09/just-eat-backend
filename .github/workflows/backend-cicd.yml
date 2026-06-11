@@ -46,12 +46,12 @@ jobs:
       - name: Tag Docker Image
         run: |
           docker tag just-eat-repository:latest \
-          678511327065.dkr.ecr.ap-southeast-2.amazonaws.com/just-eat-repository:latest
+          ${{ steps.login-ecr.outputs.registry }}/just-eat-repository:latest
 
       - name: Push Docker Image
         run: |
           docker push \
-          678511327065.dkr.ecr.ap-southeast-2.amazonaws.com/just-eat-repository:latest
+          ${{ steps.login-ecr.outputs.registry }}/just-eat-repository:latest
 
       - name: Deploy on EC2
         uses: appleboy/ssh-action@v1.0.3
