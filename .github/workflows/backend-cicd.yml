@@ -32,6 +32,10 @@ jobs:
         run: |
           git log -1 --oneline
 
+      - name: Verify Controller Mapping
+        run: |
+          grep -R 'RequestMapping("/restaurant' src/main/java
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
