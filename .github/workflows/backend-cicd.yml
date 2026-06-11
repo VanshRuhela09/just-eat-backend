@@ -39,6 +39,18 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
+      - name: Debug AWS Region
+        run: |
+         echo "AWS_REGION=$AWS_REGION"
+
+      - name: Show Registry
+        run: |
+          echo "Registry: ${{ steps.login-ecr.outputs.registry }}"
+          
+      - name: Show AWS Account
+        run: |
+          aws sts get-caller-identity
+
       - name: Build Docker Image
         run: |
           docker build -t just-eat-repository .
