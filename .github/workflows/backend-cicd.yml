@@ -28,6 +28,10 @@ jobs:
       - name: Build JAR
         run: ./mvnw clean package -DskipTests
 
+      - name: Verify Commit
+        run: |
+          git log -1 --oneline
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
